@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Docin — Healthcare Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#eef2f7;color:#1a2840;min-height:100vh}
+img{display:block;max-width:100%}
+ul{list-style:none}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+select,input{font-family:inherit;outline:none}
+
+/* ── NAVBAR ── */
+.navbar{
+  background:linear-gradient(135deg,#1a56db 0%,#1e40af 60%,#1d3fa5 100%);
+  height:64px;
+  display:flex;
+  align-items:center;
+  padding:0 32px;
+  gap:40px;
+  position:sticky;
+  top:0;
+  z-index:100;
+  box-shadow:0 2px 12px rgba(26,86,219,.35);
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  color:#fff;
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:-.3px;
+  flex-shrink:0;
+}
+.logo-icon{
+  width:34px;height:34px;
+  background:rgba(255,255,255,.22);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+}
+.logo-icon svg{color:#fff}
+
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  flex:1;
+}
+.nav-link{
+  padding:8px 16px;
+  color:rgba(255,255,255,.75);
+  font-size:14px;
+  font-weight:500;
+  border-radius:6px;
+  transition:all .18s;
+  position:relative;
+}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.1)}
+.nav-link.active{
+  color:#fff;
+  font-weight:600;
+}
+.nav-link.active::after{
+  content:'';
+  position:absolute;
+  bottom:-2px;left:50%;
+  transform:translateX(-50%);
+  width:24px;height:2px;
+  background:#fff;
+  border-radius:2px;
+}
+
+.nav-right{
+  display:flex;align-items:center;gap:14px;
+  margin-left:auto;
+}
+.notif-btn{
+  width:36px;height:36px;
+  background:rgba(255,255,255,.15);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;
+  cursor:pointer;
+  transition:background .18s;
+  position:relative;
+}
+.notif-btn:hover{background:rgba(255,255,255,.25)}
+.notif-dot{
+  position:absolute;top:6px;right:6px;
+  width:8px;height:8px;
+  background:#ef4444;
+  border:2px solid #1a56db;
+  border-radius:50%;
+}
+.nav-user{
+  display:flex;align-items:center;gap:10px;
+  color:#fff;
+  cursor:pointer;
+}
+.nav-user-name{font-size:14px;font-weight:600}
+.nav-avatar{
+  width:36px;height:36px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid rgba(255,255,255,.4);
+}
+.nav-caret{color:rgba(255,255,255,.7)}
+
+/* ── PAGE LAYOUT ── */
+.page{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 300px;
+  grid-template-rows:auto;
+  gap:20px;
+  padding:24px 28px;
+  max-width:1400px;
+  margin:0 auto;
+}
+
+/* ── WELCOME ── */
+.welcome-col{
+  grid-column:1;
+  grid-row:1;
+}
+.welcome-title{
+  font-size:20px;
+  font-weight:700;
+  color:#0f1f3d;
+  margin-bottom:14px;
+}
+
+/* ── UPCOMING APPOINTMENT ── */
+.appt-card{
+  background:#fff;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 2px 12px rgba(0,0,0,.07);
+  margin-top:0;
+}
+.appt-label{
+  display:flex;align-items:center;gap:7px;
+  font-size:12px;font-weight:600;
+  color:#1a56db;
+  margin-bottom:14px;
+}
+.appt-label-icon{
+  width:28px;height:28px;
+  background:#dbeafe;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.appt-label-icon svg{color:#1a56db}
+
+.appt-doctor-row{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:14px;
+}
+.appt-doc-img{
+  width:50px;height:50px;
+  border-radius:50%;
+  object-fit:cover;
+}
+.appt-doc-name{font-size:15px;font-weight:700;color:#0f1f3d}
+.appt-doc-spec{font-size:12px;color:#6b7280;margin-top:2px}
+
+.appt-datetime{
+  font-size:12px;
+  color:#6b7280;
+  margin-bottom:14px;
+  padding:10px 12px;
+  background:#f9fafb;
+  border-radius:8px;
+}
+.appt-datetime strong{color:#374151}
+
+.appt-btns{display:flex;gap:10px;flex-direction:column}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 16px;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:600;
+  transition:all .18s;
+  cursor:pointer;
+}
+.btn-primary{background:#1a56db;color:#fff;border:none;box-shadow:0 2px 8px rgba(26,86,219,.3)}
+.btn-primary:hover{background:#1648c0;transform:translateY(-1px);box-shadow:0 4px 14px rgba(26,86,219,.4)}
+.btn-outline{background:#fff;color:#374151;border:1.5px solid #e5e7eb}
+.btn-outline:hover{border-color:#1a56db;color:#1a56db;background:#eff6ff}
+.btn-sm{font-size:12px;padding:7px 14px}
+.btn-xs{font-size:11px;padding:5px 12px;border-radius:6px}
+.btn-full{width:100%}
+
+/* ── FIND A DOCTOR (center) ── */
+.find-col{
+  grid-column:2/4;
+  grid-row:1/3;
+}
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:20px;
+  box-shadow:0 2px 12px rgba(0,0,0,.07);
+}
+.card-title{
+  font-size:18px;
+  font-weight:700;
+  color:#0f1f3d;
+  margin-bottom:16px;
+}
+
+/* Search bar */
+.search-row{
+  display:flex;gap:12px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+.select-wrap{
+  position:relative;
+  flex:1;
+  min-width:140px;
+}
+.select-wrap select{
+  width:100%;
+  appearance:none;
+  -webkit-appearance:none;
+  background:#fff;
+  border:1.5px solid #e5e7eb;
+  border-radius:8px;
+  padding:11px 36px 11px 14px;
+  font-size:13px;
+  color:#374151;
+  cursor:pointer;
+  transition:border-color .18s;
+}
+.select-wrap select:focus{border-color:#1a56db}
+.select-wrap .arrow{
+  position:absolute;right:12px;top:50%;
+  transform:translateY(-50%);
+  pointer-events:none;
+  color:#9ca3af;
+}
+.btn-search{
+  background:#1a56db;color:#fff;border:none;
+  padding:11px 28px;
+  border-radius:8px;
+  font-size:14px;font-weight:600;
+  flex-shrink:0;
+  transition:background .18s;
+}
+.btn-search:hover{background:#1648c0}
+
+/* Doctor Cards Grid */
+.doc-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+.doc-card{
+  background:#fff;
+  border:1.5px solid #f3f4f6;
+  border-radius:12px;
+  overflow:hidden;
+  transition:all .2s;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.doc-card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.1);border-color:#bfdbfe}
+.doc-card-img-wrap{
+  height:160px;
+  overflow:hidden;
+  background:#f1f5f9;
+}
+.doc-card-img{
+  width:100%;height:100%;
+  object-fit:cover;
+  object-position:top;
+}
+.doc-card-body{
+  padding:14px;
+}
+.doc-card-name{font-size:15px;font-weight:700;color:#0f1f3d;margin-bottom:2px}
+.doc-card-spec{font-size:12px;color:#6b7280;margin-bottom:12px}
+.doc-card-btns{display:flex;gap:8px}
+.doc-card-btns .btn{flex:1;font-size:11px;padding:7px 8px}
+
+/* ── PHARMACY ── */
+.pharmacy-col{
+  grid-column:1;
+  grid-row:2;
+}
+.table-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.table-header h2{font-size:16px;font-weight:700;color:#0f1f3d}
+.table-actions{display:flex;gap:6px;color:#9ca3af}
+.icon-btn{
+  width:28px;height:28px;
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  background:#f9fafb;
+  cursor:pointer;
+  transition:background .15s;
+  border:none;
+}
+.icon-btn:hover{background:#e5e7eb}
+
+.pharm-table{width:100%;border-collapse:collapse}
+.pharm-table th{
+  padding:10px 14px;
+  text-align:left;
+  font-size:11px;
+  font-weight:600;
+  color:#9ca3af;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  border-bottom:1px solid #f3f4f6;
+}
+.pharm-table td{
+  padding:13px 14px;
+  border-bottom:1px solid #f9fafb;
+  font-size:13px;
+  color:#374151;
+  vertical-align:middle;
+}
+.pharm-table tbody tr:last-child td{border-bottom:none}
+.pharm-table tbody tr:hover td{background:#f9fafb}
+
+.med-cell{font-weight:500;color:#1a2840}
+
+.status-dot{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:500;
+}
+.dot{
+  width:10px;height:10px;
+  border-radius:50%;
+  display:inline-block;
+  flex-shrink:0;
+}
+.dot--green{background:#22c55e}
+.dot--red{background:#ef4444}
+.dot--blue{background:#3b82f6}
+
+.refill-btn{
+  background:#fff;
+  border:1.5px solid #e5e7eb;
+  border-radius:8px;
+  padding:6px 18px;
+  font-size:12px;
+  font-weight:600;
+  color:#374151;
+  cursor:pointer;
+  transition:all .18s;
+}
+.refill-btn:hover{border-color:#1a56db;color:#1a56db;background:#eff6ff}
+
+/* ── SIDEBAR ── */
+.sidebar-col{
+  grid-column:4;
+  grid-row:1/3;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+/* Notifications */
+.notif-card{
+  background:#fff;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 2px 12px rgba(0,0,0,.07);
+}
+.notif-card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.notif-card-header h3{font-size:15px;font-weight:700;color:#0f1f3d}
+.dots-btn{background:none;border:none;cursor:pointer;color:#9ca3af;letter-spacing:2px;font-size:16px}
+
+.notif-list{display:flex;flex-direction:column;gap:2px}
+.notif-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 8px;
+  border-radius:8px;
+  transition:background .15s;
+  cursor:pointer;
+}
+.notif-item:hover{background:#f9fafb}
+
+.notif-icon{
+  width:32px;height:32px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.ni--red{background:#fee2e2}
+.ni--blue{background:#dbeafe}
+.ni--yellow{background:#fef3c7}
+.ni--green{background:#dcfce7}
+
+.notif-content{flex:1;min-width:0}
+.notif-msg{font-size:12px;color:#374151;line-height:1.4}
+.notif-time{font-size:11px;color:#9ca3af;margin-top:2px}
+
+/* Book Appointment */
+.book-card{
+  background:#fff;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 2px 12px rgba(0,0,0,.07);
+}
+.book-card h3{
+  font-size:16px;font-weight:700;color:#0f1f3d;
+  margin-bottom:16px;
+}
+.book-form{display:flex;flex-direction:column;gap:10px}
+.book-input{
+  width:100%;
+  border:1.5px solid #e5e7eb;
+  border-radius:8px;
+  padding:11px 14px;
+  font-size:13px;
+  color:#374151;
+  background:#fff;
+  transition:border-color .18s;
+  appearance:none;
+  -webkit-appearance:none;
+}
+.book-input:focus{border-color:#1a56db}
+.book-input-wrap{position:relative}
+.book-input-icon{
+  position:absolute;right:12px;top:50%;
+  transform:translateY(-50%);
+  color:#9ca3af;
+  pointer-events:none;
+}
+.btn-book{
+  width:100%;
+  background:#1a56db;color:#fff;border:none;
+  padding:13px;
+  border-radius:8px;
+  font-size:14px;font-weight:700;
+  cursor:pointer;
+  transition:background .18s;
+  margin-top:4px;
+}
+.btn-book:hover{background:#1648c0}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){
+  .page{grid-template-columns:1fr 1fr 300px;grid-template-rows:auto auto}
+  .find-col{grid-column:1/3;grid-row:2}
+  .welcome-col{grid-column:1/3;grid-row:1}
+  .pharmacy-col{grid-column:1/3;grid-row:3}
+  .sidebar-col{grid-column:3;grid-row:1/4}
+}
+@media(max-width:800px){
+  .page{grid-template-columns:1fr;padding:16px}
+  .find-col,.welcome-col,.pharmacy-col,.sidebar-col{grid-column:1;grid-row:auto}
+  .doc-grid{grid-template-columns:1fr 1fr}
+  .nav-links{display:none}
+  .navbar{gap:20px}
+}
+@media(max-width:480px){
+  .doc-grid{grid-template-columns:1fr}
+  .search-row{flex-direction:column}
+  .btn-search{width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══ -->
+<nav class="navbar">
+  <a class="logo" href="#">
+    <div class="logo-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </div>
+    Docin
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#" class="nav-link active">Dashboard</a></li>
+    <li><a href="#" class="nav-link">Appointments</a></li>
+    <li><a href="#" class="nav-link">Doctors</a></li>
+    <li><a href="#" class="nav-link">Pharmacy</a></li>
+    <li><a href="#" class="nav-link">Messages</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <div class="notif-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-dot"></span>
+    </div>
+    <div class="nav-user">
+      <span class="nav-user-name">Dr. Sarah Smith</span>
+      <img src="https://i.pravatar.cc/150?img=47" alt="Dr. Sarah Smith" class="nav-avatar"/>
+      <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ PAGE ═══ -->
+<div class="page">
+
+  <!-- ── WELCOME + APPOINTMENT ── -->
+  <div class="welcome-col">
+    <p class="welcome-title">Welcome back, John!</p>
+
+    <div class="appt-card">
+      <div class="appt-label">
+        <div class="appt-label-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        Upcoming Appointment
+      </div>
+
+      <div class="appt-doctor-row">
+        <img src="https://i.pravatar.cc/150?img=47" alt="Dr. Amanda Lee" class="appt-doc-img"/>
+        <div>
+          <div class="appt-doc-name">Dr. Amanda Lee</div>
+          <div class="appt-doc-spec">Cardiologist</div>
+        </div>
+      </div>
+
+      <div class="appt-datetime">
+        <strong>May 28, 2022 &nbsp;·&nbsp; 10:00 AM</strong>
+      </div>
+
+      <div style="margin-bottom:10px">
+        <button class="btn btn-primary btn-full btn-sm">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          Join Video Call
+        </button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" style="flex:1">Reschedule</button>
+        <button class="btn btn-primary btn-sm" style="flex:1">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          Join Video Call
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FIND A DOCTOR + DOCTOR CARDS ── -->
+  <div class="find-col">
+    <div class="card">
+      <h2 class="card-title">Find a Doctor</h2>
+
+      <div class="search-row">
+        <div class="select-wrap">
+          <select>
+            <option>Specialty</option>
+            <option>Cardiology</option>
+            <option>Dermatology</option>
+            <option>Neurology</option>
+            <option>Orthopedics</option>
+            <option>Pediatrics</option>
+          </select>
+          <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="select-wrap">
+          <select>
+            <option>Location</option>
+            <option>New York, NY</option>
+            <option>Los Angeles, CA</option>
+            <option>Chicago, IL</option>
+            <option>Online</option>
+          </select>
+          <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <button class="btn-search">Search</button>
+      </div>
+
+      <!-- Doctor Cards -->
+      <div class="doc-grid">
+
+        <div class="doc-card">
+          <div class="doc-card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&q=80" alt="Dr. Mark Wilson" class="doc-card-img"/>
+          </div>
+          <div class="doc-card-body">
+            <div class="doc-card-name">Dr. Mark Wilson</div>
+            <div class="doc-card-spec">Dermatologist</div>
+            <div class="doc-card-btns">
+              <button class="btn btn-outline btn-sm">View Profile</button>
+              <button class="btn btn-primary btn-sm">Book Appointment</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="doc-card">
+          <div class="doc-card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&q=80" alt="Dr. Lisa Carter" class="doc-card-img"/>
+          </div>
+          <div class="doc-card-body">
+            <div class="doc-card-name">Dr. Lisa Carter</div>
+            <div class="doc-card-spec">Pediatrician</div>
+            <div class="doc-card-btns">
+              <button class="btn btn-outline btn-sm">View Profile</button>
+              <button class="btn btn-primary btn-sm">Book Appointment</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="doc-card">
+          <div class="doc-card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&q=80" alt="Dr. James Brown" class="doc-card-img"/>
+          </div>
+          <div class="doc-card-body">
+            <div class="doc-card-name">Dr. James Brown</div>
+            <div class="doc-card-spec">Orthopedic Surgeon</div>
+            <div class="doc-card-btns">
+              <button class="btn btn-outline btn-sm">View Profile</button>
+              <button class="btn btn-primary btn-sm">Book Appointment</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PHARMACY ── -->
+  <div class="pharmacy-col">
+    <div class="card">
+      <div class="table-header">
+        <h2>Pharmacy Orders</h2>
+        <div class="table-actions">
+          <button class="icon-btn" title="Filter">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          </button>
+          <button class="icon-btn" title="More">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <table class="pharm-table">
+        <thead>
+          <tr>
+            <th>Medication</th>
+            <th>Status</th>
+            <th>Refill</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="med-cell">Atorvastatin</td>
+            <td>
+              <span class="status-dot">
+                <span class="dot dot--green"></span>
+                Ready for Pickup
+              </span>
+            </td>
+            <td><button class="refill-btn">Refill</button></td>
+          </tr>
+          <tr>
+            <td class="med-cell">Metformin</td>
+            <td>
+              <span class="status-dot">
+                <span class="dot dot--red"></span>
+                Awaiting Refill
+              </span>
+            </td>
+            <td><button class="refill-btn">Refill</button></td>
+          </tr>
+          <tr>
+            <td class="med-cell">Lisinpril</td>
+            <td>
+              <span class="status-dot">
+                <span class="dot dot--blue"></span>
+                Shipped
+              </span>
+            </td>
+            <td><button class="refill-btn">Refill</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar-col">
+
+    <!-- Notifications -->
+    <div class="notif-card">
+      <div class="notif-card-header">
+        <h3>Notifications</h3>
+        <button class="dots-btn">···</button>
+      </div>
+      <ul class="notif-list">
+        <li class="notif-item">
+          <div class="notif-icon ni--red">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div class="notif-content">
+            <div class="notif-msg">Prescription ready for pickup</div>
+            <div class="notif-time">14:11</div>
+          </div>
+        </li>
+        <li class="notif-item">
+          <div class="notif-icon ni--blue">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="notif-content">
+            <div class="notif-msg">New message from Dr. Roberts</div>
+            <div class="notif-time">14:14</div>
+          </div>
+        </li>
+        <li class="notif-item">
+          <div class="notif-icon ni--yellow">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="notif-content">
+            <div class="notif-msg">Reminder: Blood test on May 25</div>
+            <div class="notif-time">14:14</div>
+          </div>
+        </li>
+        <li class="notif-item">
+          <div class="notif-icon ni--green">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="notif-content">
+            <div class="notif-msg">Follow-up appointment scheduled</div>
+            <div class="notif-time">14:14</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Book Appointment -->
+    <div class="book-card">
+      <h3>Book an Appointment</h3>
+      <div class="book-form">
+        <div class="book-input-wrap">
+          <input type="date" class="book-input" placeholder="Select Date"/>
+          <svg class="book-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="book-input-wrap">
+          <input type="text" class="book-input" placeholder="Select Time" onfocus="this.type='time'" onblur="if(!this.value)this.type='text'"/>
+          <svg class="book-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="book-input-wrap" style="position:relative">
+          <select class="book-input" style="padding-right:36px;cursor:pointer">
+            <option value="">Choose Doctor</option>
+            <option>Dr. Amanda Lee</option>
+            <option>Dr. Mark Wilson</option>
+            <option>Dr. Lisa Carter</option>
+            <option>Dr. James Brown</option>
+          </select>
+          <svg class="book-input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <button class="btn-book">Book Now</button>
+      </div>
+    </div>
+
+  </div><!-- /sidebar -->
+
+</div><!-- /page -->
+
+</body>
+</html>
